@@ -2,130 +2,191 @@
 @using System.Text.Json
 
 <div class="container-fluid dashboard-container">
-    <h2 class="dashboard-title">📊 Dashboard de Tarefas</h2>
+	<h2 class="dashboard-title">📊 Dashboard de Tarefas</h2>
 
-    <div class="row mb-4">
-        <div class="col-md-4">
-            <div class="card dashboard-card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Total de Tarefas</h5>
-                    <p class="display-6 fw-bold text-primary">@Model.TotalTarefas</p>
-                </div>
-            </div>
-        </div>
+	<div class="container-fluid mb-4">
+		<div class="row align-items-center">
+			<div class="col-md-6">
+				<h3 class="mb-0">🚀 Sprint Atual</h3>
+				<p class="text-muted">
+					Período: <strong>@Model.DataInicio.ToString("dd/MM/yyyy")</strong> até <strong>@Model.DataFim.ToString("dd/MM/yyyy")</strong>
+				</p>
+			</div>
+			<div class="col-md-6 text-md-end">
+				<form method="get" class="d-flex justify-content-md-end align-items-center">
+					<label for="dataInicio" class="me-2 mb-0 fw-semibold">Início:</label>
+					<input type="date" id="dataInicio" name="dataInicio" value="@Model.DataInicio.ToString("yyyy-MM-dd")" class="form-control me-3" />
 
-        <div class="col-md-4">
-            <div class="card dashboard-card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Dia Mais Produtivo</h5>
-                    <p class="fw-bold text-success" id="diaProdutivo">Calculando...</p>
-                </div>
-            </div>
-        </div>
+					<label for="dataFim" class="me-2 mb-0 fw-semibold">Fim:</label>
+					<input type="date" id="dataFim" name="dataFim" value="@Model.DataFim.ToString("yyyy-MM-dd")" class="form-control me-3" />
 
-        <div class="col-md-4">
-            <div class="card dashboard-card text-center">
-                <div class="card-body">
-                    <h5 class="card-title">Projeto em Destaque</h5>
-                    <p class="fw-bold text-warning">⚡ Em breve...</p>
-                </div>
-            </div>
-        </div>
-    </div>
+					<button type="submit" class="btn btn-primary">Filtrar</button>
+				</form>
+			</div>
+		</div>
+	</div>
 
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            <div class="card dashboard-card">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Tarefas por Classificação</h5>
-                    <canvas id="classificacaoChart"></canvas>
-                </div>
-            </div>
-        </div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card dashboard-card">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Tarefas por Cliente</h5>
-                    <canvas id="clienteChart"></canvas>
-                </div>
-            </div>
-        </div>
+	<div class="row mb-4">
+		<div class="col-md-4">
+			<div class="card dashboard-card text-center">
+				<div class="card-body">
+					<h5 class="card-title">Total de Tarefas</h5>
+					<p class="display-6 fw-bold text-primary">@Model.TotalTarefas</p>
+				</div>
+			</div>
+		</div>
 
-        <div class="col-md-4 mb-4">
-            <div class="card dashboard-card">
-                <div class="card-body">
-                    <h5 class="card-title text-center">Tarefas por Dia da Semana</h5>
-                    <canvas id="diaSemanaChart"></canvas>
-                </div>
-            </div>
-        </div>
-    </div>
+		<div class="col-md-4">
+			<div class="card dashboard-card text-center">
+				<div class="card-body">
+					<h5 class="card-title">Dia Mais Produtivo</h5>
+					<p class="fw-bold text-success" id="diaProdutivo">@Model.DiaMaisProdutivo - @Model.QuantidadeTarefasDiaMaisProdutivo tarefas</p>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4">
+			<div class="card dashboard-card text-center">
+				<div class="card-body">
+					<h5 class="card-title">Projeto em Destaque</h5>
+					<p class="fw-bold text-warning">⚡ @Model.ProjetoComMaisTarefas - @Model.QuantidadeTarefasProjeto tarefas</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="col-md-4 mb-4">
+			<div class="card dashboard-card">
+				<div class="card-body">
+					<h5 class="card-title text-center">Tarefas por Classificação</h5>
+					<canvas id="classificacaoChart"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4 mb-4">
+			<div class="card dashboard-card">
+				<div class="card-body">
+					<h5 class="card-title text-center">Tarefas por Cliente</h5>
+					<canvas id="clienteChart"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4 mb-4">
+			<div class="card dashboard-card">
+				<div class="card-body">
+					<h5 class="card-title text-center">Tarefas por Dia da Semana</h5>
+					<canvas id="diaSemanaChart"></canvas>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-md-4 mb-4">
+			<div class="card dashboard-card">
+				<div class="card-body">
+					<h5 class="card-title text-center">Tarefas por Projeto</h5>
+					<canvas id="projetoTarefasChart"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        Chart.defaults.color = '#e0e0e0';
-        Chart.defaults.plugins.legend.labels.color = '#e0e0e0';
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		let classificacaoChart;
+		let clienteChart;
+		let diaSemanaChart;
+		let projetoChart;
 
-        // === Gráfico de Classificação ===
-        var classificacaoCtx = document.getElementById('classificacaoChart').getContext('2d');
-        var classificacaoChart = new Chart(classificacaoCtx, {
-            type: 'doughnut',
-            data: {
-                labels: @Html.Raw(JsonSerializer.Serialize(Model.TarefasPorClassificacao.Keys)),
-                datasets: [{
-                    data: @Html.Raw(JsonSerializer.Serialize(Model.TarefasPorClassificacao.Values)),
-                    backgroundColor: ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8']
-                }]
-            },
-            options: { plugins: { legend: { position: 'bottom' } } }
-        });
+		function renderClassificacaoChart(data) {
+			if (classificacaoChart) classificacaoChart.destroy();
 
-        // === Gráfico de Cliente ===
-        var clienteCtx = document.getElementById('clienteChart').getContext('2d');
-        var clienteChart = new Chart(clienteCtx, {
-            type: 'bar',
-            data: {
-                labels: @Html.Raw(JsonSerializer.Serialize(Model.TarefasPorCliente.Keys)),
-                datasets: [{ label: 'Tarefas', data: @Html.Raw(JsonSerializer.Serialize(Model.TarefasPorCliente.Values)), backgroundColor: '#17a2b8' }]
-            },
-            options: {
-                plugins: { legend: { display: false } },
-                scales: { x: { ticks: { color: '#e0e0e0' } }, y: { ticks: { color: '#e0e0e0' } } }
-            }
-        });
+			const ctx = document.getElementById("classificacaoChart").getContext("2d");
+			classificacaoChart = new Chart(ctx, {
+				type: "bar",
+				data: {
+					labels: Object.keys(data),
+					datasets: [{
+						label: "Tarefas por Classificação",
+						data: Object.values(data),
+						backgroundColor: ["#007bff", "#28a745", "#ffc107", "#dc3545", "#6f42c1", "#20c997"]
+					}]
+				}
+			});
+		}
 
-        // === Gráfico de Tarefas por Dia da Semana ===
-        var dias = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-        var valores = @Html.Raw(JsonSerializer.Serialize(Model.TarefasPorDiaSemana));
+		function renderClienteChart(data) {
+			if (clienteChart) clienteChart.destroy();
 
-        var diaSemanaCtx = document.getElementById('diaSemanaChart').getContext('2d');
-        var diaSemanaChart = new Chart(diaSemanaCtx, {
-            type: 'line',
-            data: {
-                labels: dias,
-                datasets: [{
-                    label: 'Tarefas',
-                    data: valores,
-                    borderColor: '#ffc107',
-                    backgroundColor: 'rgba(255,193,7,0.2)',
-                    fill: true,
-                    tension: 0.3,
-                    pointRadius: 5,
-                    pointBackgroundColor: '#ffc107'
-                }]
-            },
-            options: {
-                plugins: { legend: { display: false } },
-                scales: { x: { ticks: { color: '#e0e0e0' } }, y: { ticks: { color: '#e0e0e0' } } }
-            }
-        });
+			const ctx = document.getElementById("clienteChart").getContext("2d");
+			clienteChart = new Chart(ctx, {
+				type: "bar",
+				data: {
+					labels: Object.keys(data),
+					datasets: [{
+						label: "Tarefas por Cliente",
+						data: Object.values(data),
+						backgroundColor: "#007bff"
+					}]
+				},
+				options: {
+					responsive: true,
+					plugins: { legend: { display: false } }
+				}
+			});
+		}
 
-        // Atualiza o card do dia mais produtivo
-        var maxValue = Math.max(...valores);
-        var maxIndex = valores.indexOf(maxValue);
-        document.getElementById("diaProdutivo").innerText = dias[maxIndex] + " (" + maxValue + " tarefas)";
-    </script>
+		function renderDiaSemanaChart(data) {
+			if (diaSemanaChart) diaSemanaChart.destroy();
+
+			const ctx = document.getElementById("diaSemanaChart").getContext("2d");
+			diaSemanaChart = new Chart(ctx, {
+				type: "line",
+				data: {
+					labels: ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"],
+					datasets: [{
+						label: "Tarefas por Dia da Semana",
+						data: data,
+						borderColor: "#28a745",
+						fill: false,
+						tension: 0.3
+					}]
+				},
+				options: { responsive: true }
+			});
+		}
+
+		function renderProjetoChart(dataKeys, dataValues) {
+			if (projetoChart) projetoChart.destroy();
+
+			const ctx = document.getElementById("projetoTarefasChart").getContext("2d");
+			projetoChart = new Chart(ctx, {
+				type: "bar",
+				data: {
+					labels: dataKeys,
+					datasets: [{
+						data: dataValues,
+						backgroundColor: ['#007bff', '#28a745', '#dc3545', '#ffc107', '#17a2b8']
+					}]
+				},
+				options: {
+					plugins: { legend: { position: 'bottom' } }
+				}
+			});
+		}
+
+		// === Chamadas iniciais ===
+		renderClassificacaoChart(@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorClassificacao)));
+		renderClienteChart(@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorCliente)));
+		renderDiaSemanaChart(@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorDiaSemana)));
+		renderProjetoChart(
+		@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorProjeto.Keys)),
+		@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorProjeto.Values))
+		);
+	</script>
 }

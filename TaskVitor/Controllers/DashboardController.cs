@@ -14,37 +14,103 @@ namespace TaskVitor.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index()
+        //TODO: Fazer refatoração para dividir esse metodo GIGANTE!
+        public async Task<IActionResult> Index(DateTime? dataInicio, DateTime? dataFim)
         {
-            var totalTarefas = await _context.Tarefas.CountAsync();
+            if (!dataInicio.HasValue || !dataFim.HasValue)
+            {
+                var hoje = DateTime.Today;
 
-            var tarefasPorClassificacao = await _context.Tarefas
+                // Calcula terça-feira da semana passada (ou desta semana se hoje >= terça)
+                int diffTercaPassada = ((int)hoje.DayOfWeek - (int)DayOfWeek.Tuesday + 7) % 7;
+                dataInicio = hoje.AddDays(-diffTercaPassada);
+
+                // Próxima terça = dataInicio + 7 dias
+                dataFim = dataInicio.Value.AddDays(7);
+            }
+
+            // Filtra tarefas dentro do range
+            var tarefasQuery = _context.Tarefas
+                .Where(t => t.Data.Date >= dataInicio.Value.Date && t.Data.Date <= dataFim.Value.Date);
+
+            // Total de tarefas
+            var totalTarefas = await tarefasQuery.CountAsync();
+
+            // Tarefas por classificação
+            var tarefasPorClassificacao = await tarefasQuery
                 .GroupBy(t => t.Classificacao.Nome)
                 .Select(g => new { Nome = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Nome, x => x.Count);
 
-            var tarefasPorCliente = await _context.Tarefas
+            // Tarefas por cliente
+            var tarefasPorCliente = await tarefasQuery
                 .GroupBy(t => t.Cliente.Nome)
                 .Select(g => new { Nome = g.Key, Count = g.Count() })
                 .ToDictionaryAsync(x => x.Nome, x => x.Count);
 
-            var tarefasPorDiaSemanaQuery = await _context.Tarefas
-                .GroupBy(t => (int)t.Data.DayOfWeek) // Sunday = 0 ... Saturday = 6
+            // Tarefas por projeto
+            var tarefasPorProjeto = await tarefasQuery
+                .GroupBy(t => t.Projeto.Nome)
+                .Select(g => new { Nome = g.Key, Count = g.Count() })
+                .ToDictionaryAsync(x => x.Nome, x => x.Count);
+
+            // Tarefas por dia da semana
+            var tarefasPorDiaSemanaQuery = await tarefasQuery
+                .GroupBy(t => (int)t.Data.DayOfWeek)
                 .Select(g => new { Dia = g.Key, Count = g.Count() })
                 .ToListAsync();
 
-            var tarefasPorDiaSemana = new int[7];
-            foreach (var item in tarefasPorDiaSemanaQuery)
+            var tarefasPorDiaSemana = Enumerable.Range(0, 7)
+                .Select(dia => tarefasPorDiaSemanaQuery.FirstOrDefault(x => x.Dia == dia)?.Count ?? 0)
+                .ToArray();
+
+            // Projeto com mais tarefas
+            var projetoComMaisTarefas = await tarefasQuery
+                .GroupBy(t => t.Projeto)
+                .Select(g => new
+                {
+                    Projeto = g.Key,
+                    Count = g.Count()
+                })
+                .OrderByDescending(g => g.Count)
+                .FirstOrDefaultAsync();
+
+            // Dia mais produtivo
+            var diaMaisProdutivoQuery = tarefasPorDiaSemanaQuery
+                .OrderByDescending(x => x.Count)
+                .FirstOrDefault();
+
+            string diaMaisProdutivo = diaMaisProdutivoQuery switch
             {
-                tarefasPorDiaSemana[item.Dia] = item.Count;
-            }
+                null => "Nenhum",
+                var x => x.Dia switch
+                {
+                    0 => "Domingo",
+                    1 => "Segunda-feira",
+                    2 => "Terça-feira",
+                    3 => "Quarta-feira",
+                    4 => "Quinta-feira",
+                    5 => "Sexta-feira",
+                    6 => "Sábado",
+                    _ => "Desconhecido"
+                }
+            };
+
+            int quantidadeTarefasDiaMaisProdutivo = diaMaisProdutivoQuery?.Count ?? 0;
 
             var viewModel = new Dashboard
             {
                 TotalTarefas = totalTarefas,
                 TarefasPorClassificacao = tarefasPorClassificacao,
                 TarefasPorCliente = tarefasPorCliente,
-                TarefasPorDiaSemana = tarefasPorDiaSemana
+                TarefasPorDiaSemana = tarefasPorDiaSemana,
+                TarefasPorProjeto = tarefasPorProjeto,
+                ProjetoComMaisTarefas = projetoComMaisTarefas?.Projeto?.Nome,
+                QuantidadeTarefasProjeto = projetoComMaisTarefas?.Count ?? 0,
+                DiaMaisProdutivo = diaMaisProdutivo,
+                QuantidadeTarefasDiaMaisProdutivo = quantidadeTarefasDiaMaisProdutivo,
+                DataInicio = dataInicio.Value,
+                DataFim = dataFim.Value
             };
 
             return View(viewModel);
