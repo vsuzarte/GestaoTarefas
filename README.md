@@ -22,13 +22,6 @@ O projeto tem como objetivo facilitar a organização de atividades, acompanhar 
   - Classificações
   - Projetos
 
-- 🎨 **Interface Moderna**
-  - Tema escuro customizado
-  - Ícones do [Bootstrap Icons](https://icons.getbootstrap.com/)
-  - Layout responsivo (desktop e mobile)
-
----
-
 ## 🛠️ Tecnologias Utilizadas
 
 - [ASP.NET Core MVC](https://learn.microsoft.com/aspnet/core)  
@@ -36,20 +29,5 @@ O projeto tem como objetivo facilitar a organização de atividades, acompanhar 
 - [Bootstrap 5](https://getbootstrap.com/) (tema escuro personalizado)  
 - [Bootstrap Icons](https://icons.getbootstrap.com/)  
 - C# • LINQ • Razor Pages  
-
----
-
-## 📷 Layout
-
-### Menu Principal
-- Dashboard e Tarefas acessíveis diretamente
-- Menu suspenso **Cadastros** para clientes, projetos, responsáveis e classificações
-
-### Dashboard
-- Gráficos interativos exibindo dados das tarefas
-
-### Tarefas
-- Tabela com colunas: Nome, Data, Classificação, Cliente, Responsável e Projeto
-- Visualização expandida da descrição
 
 ---
