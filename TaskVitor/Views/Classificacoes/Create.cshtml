@@ -1,0 +1,26 @@
+﻿@model TaskVitor.Models.Classificacao
+
+<h2 class="mb-4">Nova Classificação</h2>
+
+<form asp-action="Create" method="post" class="row g-3">
+    @Html.AntiForgeryToken()
+
+    <div class="col-12">
+        <label asp-for="Nome" class="form-label">Nome da Classificação</label>
+        <input asp-for="Nome" type="text" class="form-control" placeholder="Digite o nome da classificação..." />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-success me-2">
+            <i class="bi bi-check-lg me-1"></i> Salvar
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-x-lg me-1"></i> Cancelar
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

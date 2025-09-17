@@ -1,0 +1,104 @@
+﻿/* ======= Fundo e textos globais ======= */
+body {
+    background-color: #121212;
+    color: #e0e0e0;
+}
+
+/* Links */
+a, .nav-link {
+    color: #e0e0e0 !important;
+    transition: color 0.2s ease;
+}
+
+    a:hover, .nav-link:hover {
+        color: #0d6efd !important;
+    }
+
+/* ======= Navbar ======= */
+.navbar {
+    background-color: #111 !important;
+    border-bottom: 1px solid #222;
+}
+
+.navbar-brand strong {
+    color: #fff;
+}
+
+.navbar-brand img {
+    filter: brightness(0) invert(1);
+}
+
+/* ======= Tabelas ======= */
+.table {
+    color: #e0e0e0;
+    background-color: #1e1e1e;
+}
+
+    .table th, .table td {
+        border-color: #333;
+    }
+
+/* ======= Cards ======= */
+.card {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border: 1px solid #333;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 18px rgba(0,0,0,0.7);
+    }
+
+.card-title {
+    color: #bbb;
+    font-size: 1.1rem;
+}
+
+/* Cards específicos do dashboard */
+.dashboard-title {
+    margin-bottom: 2rem;
+    text-align: center;
+    font-weight: bold;
+    color: #f5f5f5;
+}
+
+.dashboard-card {
+    border: none; /* substitui a borda padrão */
+}
+
+/* ======= Inputs e selects ======= */
+.form-control, .form-select {
+    background-color: #1e1e1e;
+    color: #e0e0e0;
+    border: 1px solid #333;
+}
+
+    .form-control:focus, .form-select:focus {
+        background-color: #1e1e1e;
+        color: #fff;
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.2rem rgba(13,110,253,.25);
+    }
+
+/* ======= Botões ======= */
+.btn {
+    border-radius: 6px;
+    transition: transform 0.15s ease;
+}
+
+    .btn:hover {
+        transform: translateY(-2px);
+    }
+
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+
+    .btn-primary:hover {
+        background-color: #0b5ed7;
+    }

@@ -1,0 +1,98 @@
+﻿@model TaskVitor.Models.Tarefa
+
+<h2 class="mb-4">Editar Tarefa</h2>
+
+<form asp-action="Edit" method="post" class="row g-3">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+
+    <!-- Nome -->
+    <div class="col-12">
+        <label asp-for="Nome" class="form-label">Nome da Tarefa</label>
+        <input asp-for="Nome" type="text" class="form-control" placeholder="Digite o nome da tarefa..." />
+        <span asp-validation-for="Nome" class="text-danger"></span>
+    </div>
+
+    <div class="col-12">
+        <label asp-for="Descricao" class="form-label">Descrição da Tarefa</label>
+        <textarea asp-for="Descricao" type="text" class="form-control" placeholder="Digite uma breve descrição do que foi feito..."></textarea>
+    </div>
+
+    <!-- Data -->
+    <div class="col-md-4">
+        <label asp-for="Data" class="form-label">Data</label>
+        <input asp-for="Data" type="date" class="form-control" />
+        <span asp-validation-for="Data" class="text-danger"></span>
+    </div>
+
+    <!-- Classificação -->
+    <div class="col-md-4">
+        <label asp-for="ClassificacaoId" class="form-label">Classificação</label>
+        <select asp-for="ClassificacaoId" class="form-select">
+            @foreach (var c in ViewBag.Classificacoes)
+            {
+                <option value="@c.Id" selected="@(Model.ClassificacaoId == c.Id)">
+                    @c.Nome
+                </option>
+            }
+        </select>
+    </div>
+
+    <!-- Cliente -->
+    <div class="col-md-4">
+        <label asp-for="ClienteId" class="form-label">Cliente</label>
+        <select asp-for="ClienteId" class="form-select">
+            @if (ViewBag.Clientes != null && ViewBag.Clientes.Count > 0)
+            {
+                @foreach (var c in ViewBag.Clientes)
+                {
+                    <option value="@c.Id" selected="@(Model.ClienteId == c.Id)">
+                        @c.Nome
+                    </option>
+                }
+            }
+        </select>
+    </div>
+
+    <!-- Responsável -->
+    <div class="col-md-4">
+        <label asp-for="ResponsavelId" class="form-label">Responsável</label>
+        <select asp-for="ResponsavelId" class="form-select">
+            @if (ViewBag.Responsaveis != null && ViewBag.Responsaveis.Count > 0)
+            {
+                @foreach (var r in ViewBag.Responsaveis)
+                {
+                    <option value="@r.Id" selected="@(Model.ResponsavelId == r.Id)">
+                        @r.Nome
+                    </option>
+                }
+            }
+        </select>
+    </div>
+
+    <!-- Projeto -->
+    <div class="col-md-4">
+        <label asp-for="ProjetoId" class="form-label">Projeto</label>
+        <select asp-for="ProjetoId" class="form-select">
+            @foreach (var c in ViewBag.Projetos)
+            {
+                <option value="@c.Id" selected="@(Model.ProjetoId == c.Id)">
+                    @c.Nome
+                </option>
+            }
+        </select>
+    </div>
+
+    <div class="col-12">
+        <button type="submit" class="btn btn-primary me-2">
+            <i class="bi bi-check-lg me-1"></i> Salvar Alterações
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-x-lg me-1"></i> Cancelar
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
