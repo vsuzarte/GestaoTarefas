@@ -30,6 +30,7 @@ namespace TaskVitor.Controllers
                 .Include(t => t.Cliente)
                 .Include(t => t.Responsavel)
                 .Include(t => t.Projeto)
+                .Include(t => t.Apontamentos)
                 .Where(t => t.Data >= inicio && t.Data <= fim)
                 .OrderBy(t => t.Data)
                 .ToListAsync();
@@ -88,6 +89,7 @@ namespace TaskVitor.Controllers
                 .Include(t => t.Cliente)
                 .Include(t => t.Responsavel)
                 .Include(t => t.Projeto)
+                .Include(t => t.Apontamentos)
                 .FirstOrDefaultAsync(t => t.Id == id);
 
             if (tarefa == null)

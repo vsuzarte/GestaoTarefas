@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace TaskVitor.Models
 {
@@ -29,5 +30,17 @@ namespace TaskVitor.Models
         public Responsavel Responsavel { get; set; }
 
         public Projeto Projeto { get; set; }
+
+        public ICollection<Apontamento> Apontamentos { get; set; } = new List<Apontamento>();
+
+        [NotMapped]
+        public TimeSpan TempoTotal => TimeSpan.FromTicks(
+            Apontamentos
+                .Where(a => a.Duracao.HasValue)
+                .Sum(a => a.Duracao!.Value.Ticks)
+        );
+
+        [NotMapped]
+        public bool EmAndamento { get; set; }
     }
 }

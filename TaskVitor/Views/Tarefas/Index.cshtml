@@ -1,99 +1,190 @@
 ﻿@model IEnumerable<TaskVitor.Models.Tarefa>
 
 <div class="container-fluid dashboard-container">
-    <h2 class="dashboard-title">📋 Tarefas</h2>
+	<h2 class="dashboard-title">📋 Tarefas</h2>
 
-    <!-- ======= Card de Filtros ======= -->
-    <div class="card dashboard-card mb-4 p-3">
-        <form method="get" class="row g-3 align-items-end">
-            <div class="col-auto">
-                <label for="dataInicio" class="form-label">De</label>
-                <input type="date" id="dataInicio" name="dataInicio" class="form-control" value="@ViewBag.DataInicio" />
-            </div>
-            <div class="col-auto">
-                <label for="dataFim" class="form-label">Até</label>
-                <input type="date" id="dataFim" name="dataFim" class="form-control" value="@ViewBag.DataFim" />
-            </div>
-            <div class="col-auto">
-                <button type="submit" class="btn btn-primary">Buscar</button>
-            </div>
-        </form>
-    </div>
+	<!-- ======= Card de Filtros ======= -->
+	<div class="card dashboard-card mb-4 p-3">
+		<form method="get" class="row g-3 align-items-end">
+			<div class="col-auto">
+				<label for="dataInicio" class="form-label">De</label>
+				<input type="date" id="dataInicio" name="dataInicio" class="form-control" value="@ViewBag.DataInicio" />
+			</div>
+			<div class="col-auto">
+				<label for="dataFim" class="form-label">Até</label>
+				<input type="date" id="dataFim" name="dataFim" class="form-control" value="@ViewBag.DataFim" />
+			</div>
+			<div class="col-auto">
+				<button type="submit" class="btn btn-primary">Buscar</button>
+			</div>
+		</form>
+	</div>
 
-    <!-- ======= Botão de Nova Tarefa ======= -->
-    <div class="mb-3 d-flex justify-content-end">
-        <a asp-controller="Tarefas" asp-action="Create" class="btn btn-success">
-            <i class="bi bi-plus-lg me-1"></i> Nova Tarefa
-        </a>
-    </div>
+	<!-- ======= Botão de Nova Tarefa ======= -->
+	<div class="mb-3 d-flex justify-content-end">
+		<a asp-controller="Tarefas" asp-action="Create" class="btn btn-success">
+			<i class="bi bi-plus-lg me-1"></i> Nova Tarefa
+		</a>
+	</div>
 
-    <!-- ======= Grupos por Dia da Semana ======= -->
-    @foreach (var grupo in Model.GroupBy(t => t.Data.DayOfWeek).OrderBy(g => g.Key))
-    {
-        var nomeDia = System.Globalization.CultureInfo
-        .GetCultureInfo("pt-BR")
-        .DateTimeFormat
-        .GetDayName(grupo.Key);
+	<!-- ======= Grupos por Dia da Semana ======= -->
+	@foreach (var grupo in Model.GroupBy(t => t.Data.DayOfWeek).OrderBy(g => g.Key))
+	{
+		var nomeDia = System.Globalization.CultureInfo
+		.GetCultureInfo("pt-BR")
+		.DateTimeFormat
+		.GetDayName(grupo.Key);
 
-        <div class="card dashboard-card mb-4 p-3">
-            <h4 class="mb-3 text-primary text-uppercase">@nomeDia</h4>
+		<div class="card dashboard-card mb-4 p-3">
+			<h4 class="mb-3 text-primary text-uppercase">@nomeDia</h4>
 
-            <div class="table-responsive">
-                <table class="table table-dark table-striped table-hover align-middle mb-0">
-                    <thead>
-                        <tr>
-                            <th></th>
-                            <th>Nome</th>
-                            <th>Data</th>
-                            <th>Classificação</th>
-                            <th>Cliente</th>
-                            <th>Responsável</th>
-                            <th>Projeto</th>
-                            <th>Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var t in grupo.OrderBy(t => t.Data))
-                        {
-                            var collapseId = "desc-" + t.Id;
-                            <tr>
-                                <td>
-                                    <button class="btn btn-sm btn-outline-info" type="button"
-                                            data-bs-toggle="collapse" data-bs-target="#@collapseId"
-                                            aria-expanded="false" aria-controls="@collapseId">
-                                        <i class="bi bi-chevron-down"></i>
-                                    </button>
-                                </td>
-                                <td>@t.Nome</td>
-                                <td>@t.Data.ToString("dd/MM/yyyy")</td>
-                                <td>@t.Classificacao?.Nome</td>
-                                <td>@t.Cliente?.Nome</td>
-                                <td>@t.Responsavel?.Nome</td>
-                                <td>@t.Projeto?.Nome</td>
-                                <td>
-                                    <form asp-action="Delete" asp-route-id="@t.Id" method="post" class="d-inline"
-                                          onsubmit="return confirm('Deseja realmente excluir esta tarefa?');">
-                                        <button type="submit" class="btn btn-sm btn-danger">
-                                            <i class="bi bi-trash-fill"></i>
-                                        </button>
-                                    </form>
-                                    <a asp-action="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-warning me-1">
-                                        <i class="bi bi-pencil-fill"></i>
-                                    </a>
-                                </td>
-                            </tr>
+			<div class="table-responsive">
+				<table class="table table-dark table-striped table-hover align-middle mb-0">
+					<thead>
+						<tr>
+							<th></th>
+							<th>Nome</th>
+							<th>Data</th>
+							<th>Classificação</th>
+							<th>Cliente</th>
+							<th>Responsável</th>
+							<th>Projeto</th>
+							<th>Tempo Gasto</th>
+							<th>Ações</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var t in grupo.OrderBy(t => t.Data))
+						{
+							var collapseId = "desc-" + t.Id;
+							var tempoTotalSegundos = t.TempoTotal.TotalSeconds > 0 ? t.TempoTotal.TotalSeconds : 0;
+							var emAndamento = t.Apontamentos.Any(a => a.Fim == null);
+							var inicio = emAndamento ? t.Apontamentos.First(a => a.Fim == null).Inicio.ToString("o") : null;
 
-                            <!-- Linha oculta que abre com collapse -->
-                            <tr class="collapse" id="@collapseId">
-                                <td colspan="8" class="bg-secondary text-white">
-                                    <strong>Descrição:</strong>
-                                    <p class="mb-0">@t.Descricao</p>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    }
+							<tr>
+								<td>
+									<button class="btn btn-sm btn-outline-info" type="button"
+											data-bs-toggle="collapse" data-bs-target="#@collapseId"
+											aria-expanded="false" aria-controls="@collapseId">
+										<i class="bi bi-chevron-down"></i>
+									</button>
+								</td>
+								<td>@t.Nome</td>
+								<td>@t.Data.ToString("dd/MM/yyyy")</td>
+								<td>@t.Classificacao?.Nome</td>
+								<td>@t.Cliente?.Nome</td>
+								<td>@t.Responsavel?.Nome</td>
+								<td>@t.Projeto?.Nome</td>
+
+								<td class="tempo-gasto"
+									data-tempo-total="@tempoTotalSegundos"
+									data-em-andamento="@emAndamento.ToString().ToLower()"
+								@(inicio != null ? $"data-inicio='{inicio}'" : "")>
+									@t.TempoTotal.ToString(@"hh\:mm\:ss")
+								</td>
+
+								<td>
+									<button type="button" class="btn btn-sm btn-play-stop @(emAndamento ? "btn-danger" : "btn-success")"
+											data-id="@t.Id"
+											data-em-andamento="@emAndamento.ToString().ToLower()">
+										<i class="bi @(emAndamento ? "bi-stop-fill" : "bi-play-fill")"></i>
+									</button>
+
+									<!-- Editar -->
+									<a asp-controller="Tarefas" asp-action="Edit" asp-route-id="@t.Id" class="btn btn-sm btn-warning me-1">
+										<i class="bi bi-pencil-fill"></i>
+									</a>
+
+									<!-- Deletar -->
+									<form asp-controller="Tarefas" asp-action="Delete" asp-route-id="@t.Id" method="post" class="d-inline"
+										  onsubmit="return confirm('Deseja realmente excluir esta tarefa?');">
+										<button type="submit" class="btn btn-sm btn-outline-danger">
+											<i class="bi bi-trash-fill"></i>
+										</button>
+									</form>
+								</td>
+							</tr>
+
+							<!-- Linha de descrição -->
+							<tr class="collapse" id="@collapseId">
+								<td colspan="11" class="bg-secondary text-white">
+									<strong>Descrição:</strong>
+									<p class="mb-0">@t.Descricao</p>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	}
 </div>
+
+@section Scripts {
+	<script>
+			document.addEventListener("DOMContentLoaded", function () {
+				function formatTime(seconds) {
+					let h = Math.floor(seconds / 3600).toString().padStart(2, "0");
+					let m = Math.floor((seconds % 3600) / 60).toString().padStart(2, "0");
+					let s = Math.floor(seconds % 60).toString().padStart(2, "0");
+					return `${h}:${m}:${s}`;
+				}
+
+				// Atualiza o tempo a cada segundo
+				setInterval(() => {
+					document.querySelectorAll(".tempo-gasto").forEach(td => {
+						let emAndamento = td.dataset.emAndamento === "true";
+						let total = parseInt(td.dataset.tempoTotal || "0");
+
+						if (emAndamento && td.dataset.inicio) {
+							let inicio = new Date(td.dataset.inicio);
+							if (!isNaN(inicio)) {
+								let agora = new Date();
+								let diff = Math.floor((agora - inicio) / 1000);
+								td.textContent = formatTime(total + diff);
+							}
+						} else {
+							td.textContent = formatTime(total);
+						}
+					});
+				}, 1000);
+
+				// Botão Play/Stop via AJAX
+				document.querySelectorAll(".btn-play-stop").forEach(btn => {
+					btn.addEventListener("click", async function () {
+						const taskId = this.dataset.id;
+						const td = this.closest("tr").querySelector(".tempo-gasto");
+
+						// Pega token anti-forgery
+						const token = document.querySelector('input[name="__RequestVerificationToken"]').value;
+
+						const res = await fetch(`/Apontamentos/Alternar/${taskId}`, {
+							method: "POST",
+							headers: {
+								"RequestVerificationToken": token
+							}
+						});
+
+						if (res.ok) {
+							// O endpoint deve retornar JSON com o tempo total atualizado em segundos
+							const data = await res.json(); // { tempoTotalSegundos: number, emAndamento: boolean }
+
+							td.dataset.tempoTotal = data.tempoTotalSegundos;
+							td.dataset.emAndamento = data.emAndamento;
+							td.dataset.inicio = data.emAndamento ? new Date().toISOString() : "";
+
+							// Atualiza o tempo visual imediatamente
+							const total = parseInt(td.dataset.tempoTotal || "0");
+							td.textContent = formatTime(total);
+
+							// muda ícone e cor do botão
+							this.classList.toggle("btn-success", !data.emAndamento);
+							this.classList.toggle("btn-danger", data.emAndamento);
+							this.querySelector("i").classList.toggle("bi-play-fill", !data.emAndamento);
+							this.querySelector("i").classList.toggle("bi-stop-fill", data.emAndamento);
+						}
+					});
+				});
+		});
+	</script>
+}
