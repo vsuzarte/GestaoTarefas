@@ -92,6 +92,23 @@
 				</div>
 			</div>
 		</div>
+
+		<div class="col-md-4 mb-4">
+			<div class="card dashboard-card">
+				<div class="card-body">
+					<h5 class="card-title text-center">Tempo Gasto por Projeto</h5>
+					<canvas id="tempoProjetoChart"></canvas>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-4 mb-4">
+			<div class="card dashboard-card">
+				<div class="card-body">
+					<h5 class="card-title text-center">Tempo Gasto por Classificação</h5>
+					<canvas id="tempoClassChart"></canvas>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
 
@@ -102,6 +119,8 @@
 		let clienteChart;
 		let diaSemanaChart;
 		let projetoChart;
+		let tempoProjetoChart;
+		let tempoClassChart;
 
 		function renderClassificacaoChart(data) {
 			if (classificacaoChart) classificacaoChart.destroy();
@@ -180,6 +199,52 @@
 			});
 		}
 
+		function renderTempoProjetoChart(dataKeys, dataValues) {
+			if (tempoProjetoChart) tempoProjetoChart.destroy();
+
+			const ctx = document.getElementById("tempoProjetoChart").getContext("2d");
+			tempoProjetoChart = new Chart(ctx, {
+				type: "bar",
+				data: {
+					labels: dataKeys,
+					datasets: [{
+						label: "Tempo Gasto (horas)",
+						data: dataValues.map(v => (v / 3600).toFixed(2)), // converte segundos para horas
+						backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#20c997']
+					}]
+				},
+				options: {
+					responsive: true,
+					plugins: {
+						legend: { display: true, position: 'bottom' }
+					}
+				}
+			});
+		}
+
+		function renderTempoClassChart(dataKeys, dataValues) {
+			if (tempoClassChart) tempoClassChart.destroy();
+
+			const ctx = document.getElementById("tempoClassChart").getContext("2d");
+			tempoClassChart = new Chart(ctx, {
+				type: "bar",
+				data: {
+					labels: dataKeys,
+					datasets: [{
+						label: "Tempo Gasto (horas)",
+						data: dataValues.map(v => (v / 3600).toFixed(2)), // converte segundos para horas
+						backgroundColor: ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#20c997']
+					}]
+				},
+				options: {
+					responsive: true,
+					plugins: {
+						legend: { display: true, position: 'bottom' }
+					}
+				}
+			});
+		}
+
 		// === Chamadas iniciais ===
 		renderClassificacaoChart(@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorClassificacao)));
 		renderClienteChart(@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorCliente)));
@@ -187,6 +252,14 @@
 		renderProjetoChart(
 		@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorProjeto.Keys)),
 		@Html.Raw(JsonSerializer.Serialize(Model.TarefasPorProjeto.Values))
+		);
+		renderTempoClassChart(
+		@Html.Raw(JsonSerializer.Serialize(Model.TempoPorClassificacao.Keys)),
+		@Html.Raw(JsonSerializer.Serialize(Model.TempoPorClassificacao.Values))
+		);
+		renderTempoProjetoChart(
+		@Html.Raw(JsonSerializer.Serialize(Model.TempoPorProjeto.Keys)),
+		@Html.Raw(JsonSerializer.Serialize(Model.TempoPorProjeto.Values))
 		);
 	</script>
 }

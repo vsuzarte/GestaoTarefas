@@ -98,6 +98,32 @@ namespace TaskVitor.Controllers
 
             int quantidadeTarefasDiaMaisProdutivo = diaMaisProdutivoQuery?.Count ?? 0;
 
+            var tempoPorProjeto = _context.Tarefas
+                                    .Include(t => t.Apontamentos)
+                                    .Include(t => t.Projeto)
+                                    .Where(t => t.Data >= dataInicio && t.Data <= dataFim)
+                                    .GroupBy(t => t.Projeto!.Nome)
+                                    .ToDictionary(
+                                        g => g.Key!,
+                                        g => g.Sum(t => t.Apontamentos.Sum(a =>
+                                            a.DuracaoManual?.TotalSeconds
+                                            ?? (a.Fim.HasValue ? (a.Fim.Value - a.Inicio).TotalSeconds
+                                            : (DateTime.Now - a.Inicio).TotalSeconds)))
+                                    );
+
+            var tempoPorClassificacao = _context.Tarefas
+                                   .Include(t => t.Apontamentos)
+                                   .Include(t => t.Classificacao)
+                                   .Where(t => t.Data >= dataInicio && t.Data <= dataFim)
+                                   .GroupBy(t => t.Classificacao!.Nome)
+                                   .ToDictionary(
+                                       g => g.Key!,
+                                       g => g.Sum(t => t.Apontamentos.Sum(a =>
+                                           a.DuracaoManual?.TotalSeconds
+                                           ?? (a.Fim.HasValue ? (a.Fim.Value - a.Inicio).TotalSeconds
+                                           : (DateTime.Now - a.Inicio).TotalSeconds)))
+                                   );
+
             var viewModel = new Dashboard
             {
                 TotalTarefas = totalTarefas,
@@ -110,7 +136,9 @@ namespace TaskVitor.Controllers
                 DiaMaisProdutivo = diaMaisProdutivo,
                 QuantidadeTarefasDiaMaisProdutivo = quantidadeTarefasDiaMaisProdutivo,
                 DataInicio = dataInicio.Value,
-                DataFim = dataFim.Value
+                DataFim = dataFim.Value,
+                TempoPorProjeto = tempoPorProjeto,
+                TempoPorClassificacao = tempoPorClassificacao
             };
 
             return View(viewModel);
