@@ -11,6 +11,12 @@ O projeto tem como objetivo facilitar a organização de atividades, acompanhar 
   - Criar, editar e excluir tarefas
   - Visualizar descrições detalhadas com collapse
   - Agrupamento de tarefas por dia da semana
+  - Apontar tempo das tarefas
+ 
+- ✅ **Gerenciamento de Lembrete**
+  - Criar, editar e excluir lembretes
+  - Criar tarefas a partir dos lembretes
+  - Notificação dos lembretes perto da data final
 
 - 📊 **Dashboard**
   - Total de tarefas cadastradas
