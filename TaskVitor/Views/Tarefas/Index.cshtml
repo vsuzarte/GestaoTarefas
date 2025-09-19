@@ -28,7 +28,7 @@
 	</div>
 
 	<!-- ======= Grupos por Dia da Semana ======= -->
-	@foreach (var grupo in Model.GroupBy(t => t.Data.DayOfWeek).OrderBy(g => g.Key))
+	@foreach (var grupo in Model.GroupBy(t => t.Data.DayOfWeek).OrderByDescending(g => g.Key))
 	{
 		var nomeDia = System.Globalization.CultureInfo
 		.GetCultureInfo("pt-BR")
@@ -54,7 +54,7 @@
 						</tr>
 					</thead>
 					<tbody>
-						@foreach (var t in grupo.OrderBy(t => t.Data))
+						@foreach (var t in grupo.OrderByDescending(t => t.Data))
 						{
 							var collapseId = "desc-" + t.Id;
 							var collapseApontamentosId = "apontamentos-" + t.Id;
