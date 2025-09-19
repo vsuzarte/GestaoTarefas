@@ -52,6 +52,32 @@ namespace TaskVitor.Controllers
             return View();
         }
 
+        public async Task<IActionResult> Lembrete(int id)
+        {
+            var lembrete = await _context.Lembretes.FindAsync(id);
+
+            if (lembrete == null)
+                return NotFound();
+
+            lembrete.Concluido = true;
+            await _context.SaveChangesAsync();
+
+            ViewBag.Classificacoes = _context.Classificacoes.ToList();
+            ViewBag.Clientes = _context.Clientes.ToList();
+            ViewBag.Responsaveis = _context.Responsaveis.ToList();
+            ViewBag.Projetos = _context.Projetos.ToList();
+
+            var tarefa = new Tarefa
+            {
+                Nome = lembrete.Titulo,
+                Descricao = lembrete.Descricao,
+                Data = lembrete.DataHora,
+            };
+
+            // Retorna a view Create diretamente com o modelo
+            return View("Create", tarefa);
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(Tarefa tarefa)
         {

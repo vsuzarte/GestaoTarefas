@@ -1,0 +1,52 @@
+﻿@model List<TaskVitor.Models.Lembrete>
+
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle d-flex align-items-center" href="#" id="notificacoesDropdown" role="button"
+       data-bs-toggle="dropdown" aria-expanded="false">
+        <i class="bi bi-bell-fill me-1"></i>
+        <span>Notificações</span>
+        @if (Model.Any())
+        {
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                @Model.Count
+                <span class="visually-hidden">lembretes não lidos</span>
+            </span>
+        }
+    </a>
+
+    <ul class="dropdown-menu dropdown-menu-end dropdown-menu-dark p-2"
+        aria-labelledby="notificacoesDropdown" style="min-width: 300px; max-height: 400px; overflow-y:auto;">
+
+        @if (Model.Any())
+        {
+            <li class="dropdown-header text-center fw-bold mb-2">Lembretes</li>
+
+            @foreach (var lembrete in Model)
+            {
+                <li class="mb-2">
+                    <div class="dropdown-item bg-dark rounded p-2 d-flex flex-column">
+                        <span class="fw-bold text-white">@lembrete.Titulo</span>
+                        <small class="text-muted">@lembrete.DataHora.ToString("g")</small>
+                    </div>
+                </li>
+            }
+
+            <li>
+                <hr class="dropdown-divider" />
+            </li>
+
+            <li>
+                <a class="dropdown-item text-center fw-bold text-primary"
+                   asp-controller="Lembretes" asp-action="Index">
+                    Ver todos os lembretes
+                </a>
+            </li>
+        }
+        else
+        {
+            <li>
+                <span class="dropdown-item text-center text-muted">Nenhum lembrete hoje</span>
+            </li>
+        }
+    </ul>
+</li>

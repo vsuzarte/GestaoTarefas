@@ -1,0 +1,148 @@
+﻿@model IEnumerable<TaskVitor.Models.Lembrete>
+
+<div class="container-fluid dashboard-container">
+	<h2 class="dashboard-title mb-4">📌 Lembretes</h2>
+
+	<!-- Filtros -->
+	<div class="row mb-3">
+		<div class="col-md-8 d-flex gap-2">
+			<a asp-action="Index" asp-route-filtro="naoConcluidos" class="btn btn-outline-primary btn-sm">
+				<i class="bi bi-circle me-1"></i> Não Concluídos
+			</a>
+			<a asp-action="Index" asp-route-filtro="todos" class="btn btn-outline-secondary btn-sm">
+				<i class="bi bi-list-task me-1"></i> Todos
+			</a>
+			<a asp-action="Index" asp-route-filtro="concluidos" class="btn btn-outline-success btn-sm">
+				<i class="bi bi-check2-all me-1"></i> Concluídos
+			</a>
+			<a asp-action="Index" asp-route-filtro="atrasados" class="btn btn-outline-danger btn-sm">
+				<i class="bi bi-exclamation-triangle me-1"></i> Atrasados
+			</a>
+		</div>
+		<div class="col-md-4 text-end">
+			<a asp-action="Create" class="btn btn-success btn-sm">
+				<i class="bi bi-plus-lg me-1"></i> Novo Lembrete
+			</a>
+		</div>
+	</div>
+
+	<!-- Cards de lembretes -->
+	<div class="row g-3">
+		@if (!Model.Any())
+		{
+			<div class="col-12">
+				<div class="alert alert-info text-center">
+					Nenhum lembrete encontrado com esse filtro.
+				</div>
+			</div>
+		}
+		else
+		{
+			@foreach (var item in Model.OrderBy(l => l.DataHora))
+			{
+				var atrasado = item.DataHora < DateTime.Now && !item.Concluido;
+
+				<div class="col-md-4 col-lg-3">
+					<div class="card shadow-sm h-100 lembrete-card @(item.Concluido ? "border-success" : atrasado ? "border-danger" : "border-warning")">
+
+						<!-- Cabeçalho com ações -->
+						<div class="card-header d-flex justify-content-between align-items-center p-2">
+							<span class="badge @(item.Concluido ? "bg-success" : atrasado ? "bg-danger" : "bg-warning text-dark")">
+								@(item.Concluido ? "Concluído" : atrasado ? "Atrasado" : "Pendente")
+							</span>
+							<div class="btn-group">
+								<a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-primary" title="Editar">
+									<i class="bi bi-pencil-square"></i>
+								</a>
+								<a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-outline-danger" title="Excluir">
+									<i class="bi bi-trash"></i>
+								</a>
+								@if (!item.Concluido)
+								{
+									<button type="button" class="btn btn-sm btn-outline-success"
+											data-bs-toggle="modal"
+											data-bs-target="#concluirModal"
+											data-lembrete-id="@item.Id"
+											data-lembrete-titulo="@item.Titulo"
+											data-lembrete-descricao="@item.Descricao"
+											data-lembrete-data="@item.DataHora.ToString("yyyy-MM-ddTHH:mm")"
+											title="Concluir">
+										<i class="bi bi-check-lg"></i>
+									</button>
+								}
+							</div>
+						</div>
+
+						<!-- Corpo do card -->
+						<div class="card-body">
+							<h5 class="card-title">@item.Titulo</h5>
+							<p class="card-text text-muted">@item.Descricao</p>
+						</div>
+
+						<!-- Rodapé do card -->
+						<div class="card-footer small text-muted">
+							<i class="bi bi-calendar-event me-1"></i> @item.DataHora.ToString("dd/MM/yyyy HH:mm")<br />
+							<i class="bi bi-bell me-1"></i> @item.DiasAntecedencia dia(s) antes
+						</div>
+					</div>
+				</div>
+			}
+		}
+	</div>
+</div>
+
+<!-- Modal para concluir lembrete -->
+<div class="modal fade" id="concluirModal" tabindex="-1" aria-labelledby="concluirModalLabel" aria-hidden="true">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title" id="concluirModalLabel">Concluir Lembrete</h5>
+				<button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+			</div>
+			<div class="modal-body">
+				<p>Deseja criar uma tarefa a partir deste lembrete?</p>
+			</div>
+			<div class="modal-footer">
+				<!-- Botão NÃO: apenas conclui -->
+				<form id="formConcluir" asp-action="Concluir" asp-controller="Lembretes" method="post">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="id" id="lembreteIdConcluir" />
+					<button type="submit" class="btn btn-secondary">Não</button>
+				</form>
+
+				<!-- Botão SIM: conclui e cria tarefa -->
+				<form id="formCriarTarefa" asp-action="Lembrete" asp-controller="Tarefas" method="get">
+					@Html.AntiForgeryToken()
+					<input type="hidden" name="id" id="lembreteIdCriarTarefa" />
+					<button type="submit" class="btn btn-success">Sim</button>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+
+@section Scripts {
+	<script>
+		var concluirModal = document.getElementById('concluirModal');
+		concluirModal.addEventListener('show.bs.modal', function (event) {
+			// Botão que disparou o modal
+			var button = event.relatedTarget;
+
+			// Pega os dados do lembrete
+			var lembreteId = button.getAttribute('data-lembrete-id');
+			var lembreteTitulo = button.getAttribute('data-lembrete-titulo');
+			var lembreteDescricao = button.getAttribute('data-lembrete-descricao');
+			var lembreteData = button.getAttribute('data-lembrete-data');
+
+			// Atualiza os inputs hidden dos forms
+			document.getElementById('lembreteIdConcluir').value = lembreteId;
+			document.getElementById('lembreteIdCriarTarefa').value = lembreteId;
+
+			// Opcional: atualizar o título do modal ou mensagem
+			var modalTitle = concluirModal.querySelector('.modal-title');
+			modalTitle.textContent = `Concluir Lembrete: ${lembreteTitulo}`;
+		});
+	</script>
+
+}

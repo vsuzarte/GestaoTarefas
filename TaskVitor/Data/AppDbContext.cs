@@ -18,5 +18,7 @@ namespace TaskVitor.Data
         public DbSet<Projeto> Projetos { get; set; }
 
         public DbSet<Apontamento> Apontamentos { get; set; }
+
+        public DbSet<Lembrete> Lembretes { get; set; }
     }
 }
